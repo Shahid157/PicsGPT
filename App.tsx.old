@@ -1,0 +1,63 @@
+import React, {useEffect} from 'react';
+import {View, StyleSheet} from 'react-native';
+import Navigation from './src/navigation/routes';
+import { PaperProvider } from 'react-native-paper';
+import { Provider } from 'react-redux';
+import store from './src/store';
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+import { StatsigProvider } from "statsig-react-native";
+import Freshpaint from '@freshpaint/freshpaint-react-native';
+import {initialize} from 'react-native-clarity';
+
+// Remove this method to stop OneSignal Debugging
+OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+// OneSignal Initialization
+OneSignal.initialize(process.env.ONE_SIGNAL_KEY || '');
+
+// requestPermission will show the native iOS or Android notification permission prompt.
+// We recommend removinpg the following code and instead using an In-App Message to prompt for notification permission
+OneSignal.Notifications.requestPermission(true);
+
+// Method for listening for notification clicks
+OneSignal.Notifications.addEventListener('click', (event) => { });
+
+const App = () => {
+
+  useEffect(() => {
+    Freshpaint.init(process.env.FRESHPAINT_ENV_ID);
+    initialize(process.env.CLARITY_KEY || '');
+  }, [])
+
+  return (
+    <StatsigProvider
+      sdkKey={process.env.STATSIG_API_KEY ?? ""}
+      waitForInitialization={true}
+      user={{
+        userID: 'test',
+        userAgent: "test",
+        email: 'test@gmail.com'
+      }}
+      options={{
+        environment: { tier: "staging" },
+      }}
+    >
+        <Provider store={store}>
+          <PaperProvider>
+            <View style={styles.container}>
+              <Navigation />
+            </View>
+          </PaperProvider>
+        </Provider>
+    </StatsigProvider>
+
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
+export default App;

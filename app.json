@@ -1,0 +1,5 @@
+{
+  "name": "Styley",
+  "displayName": "Styley",
+  "plugins": ["@heap/react-native-heap"]
+}
